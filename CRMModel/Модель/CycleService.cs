@@ -14,7 +14,7 @@ namespace ImitModelBl.Model
         public Customer Customer { get; set; }
         public List<ClientService> ClientServices { get; set; } = new List<ClientService>();
         public int CountServices => QueueCycleServices.Count;//кол-во
-        public Queue<Service> QueueCycleServices { get; set; }
+        public Queue<Service> QueueCycleServices { get; set; } = new Queue<Service>();
         public CycleService(Customer customer, Service service, List<ClientService> clientServices)
         {
             Customer = customer;
