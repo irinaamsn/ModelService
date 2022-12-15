@@ -22,7 +22,7 @@ namespace ImitModelBl.Model
         Random rnd = new();
         Generator generator = new();
         bool isRunning = false;
-        public List<CycleService> CycleServices { get; set; }
+        public List<CycleService> CycleServices { get; set; } = new List<CycleService> ();
         public Queue<Master> BelowMasters { get; set; } = new Queue<Master>();
         public Queue<Master> HairMasters { get; set; } = new Queue<Master>();
         public Queue<Master> ManMasters { get; set; } = new Queue<Master>();
