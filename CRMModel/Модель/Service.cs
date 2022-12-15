@@ -10,7 +10,7 @@ namespace ImitModelBl.Model
     {
         public int ServiceId { get; set; }
         public string Name { get; set; }
-        public List<string> PlaceServiceType { get; set; } =new List<string>();
+        public List<string> ChairsService { get; set; } =new List<string>();
         public decimal Price { get; set; }
         public List<Master> ListMasters { get; set; } 
         public int TimeRunning { get; set; }
