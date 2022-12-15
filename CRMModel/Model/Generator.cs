@@ -44,7 +44,7 @@ namespace ImitModelBl.Model
                 ServiceId = 1,
                 Name = AllServices.стрижка.ToString(),
                 //Name = Enum.GetName(typeof(AllServices),rnd.Next(1,5)),//Guid.NewGuid().ToString().Substring(0, 5),
-                PlaceServiceType = Enum.GetNames(typeof(PlaceServices)).Where(X => X != PlaceServices.HairStylingChair.ToString() && X != PlaceServices.СhairForSpaTreatments.ToString() && X != PlaceServices.ManHairDressingChair.ToString()).ToList(),
+                ChairsService = Enum.GetNames(typeof(PlaceServices)).Where(X => X != PlaceServices.HairStylingChair.ToString() && X != PlaceServices.СhairForSpaTreatments.ToString() && X != PlaceServices.ManHairDressingChair.ToString()).ToList(),
                 //ListMasters = Masters.Where(m => m.Speciality == CategoryMaster.Hairdresser.ToString() && m.Speciality == CategoryMaster.ManMaster.ToString()).ToList(),
                 Price = Convert.ToDecimal(rnd.Next(3000, 15000)),//individ
                 TimeRunning = rnd.Next(60, 240),//individ
@@ -56,7 +56,7 @@ namespace ImitModelBl.Model
             {
                 ServiceId = 2,
                 Name = AllServices.бритье.ToString(),
-                PlaceServiceType = Enum.GetNames(typeof(PlaceServices)).Where(X => X == PlaceServices.ManHairDressingChair.ToString()).ToList(),
+                ChairsService = Enum.GetNames(typeof(PlaceServices)).Where(X => X == PlaceServices.ManHairDressingChair.ToString()).ToList(),
                 ListMasters = Masters.Where(m => m.Speciality == CategoryMaster.ManMaster.ToString()).ToList(),
                 Price = Convert.ToDecimal(rnd.Next(1000, 5000)),
                 TimeRunning = rnd.Next(20, 90),
@@ -67,7 +67,7 @@ namespace ImitModelBl.Model
             {
                 ServiceId = 3,
                 Name = AllServices.покраска_волос.ToString(),
-                PlaceServiceType = Enum.GetNames(typeof(PlaceServices)).Where(X => X != PlaceServices.HairStylingChair.ToString() && X != PlaceServices.СhairForSpaTreatments.ToString() && X != PlaceServices.ManHairDressingChair.ToString()).ToList(),
+                ChairsService = Enum.GetNames(typeof(PlaceServices)).Where(X => X != PlaceServices.HairStylingChair.ToString() && X != PlaceServices.СhairForSpaTreatments.ToString() && X != PlaceServices.ManHairDressingChair.ToString()).ToList(),
                 //ListMasters = Masters.Where(m => m.Speciality == CategoryMaster.Hairdresser.ToString() && m.Speciality == CategoryMaster.ManMaster.ToString() && m.Speciality == CategoryMaster.Stylist.ToString()).ToList(),
                 Price = Convert.ToDecimal(rnd.Next(5000, 30000)),//individ
                 TimeRunning = rnd.Next(60, 360),//individ
@@ -78,7 +78,7 @@ namespace ImitModelBl.Model
             {
                 ServiceId = 4,
                 Name = AllServices.укладка.ToString(),
-                PlaceServiceType = Enum.GetNames(typeof(PlaceServices)).Where(X => X != PlaceServices.HairStylingChair.ToString() && X != PlaceServices.СhairForSpaTreatments.ToString() && X != PlaceServices.ManHairDressingChair.ToString()).ToList(),
+                ChairsService = Enum.GetNames(typeof(PlaceServices)).Where(X => X != PlaceServices.HairStylingChair.ToString() && X != PlaceServices.СhairForSpaTreatments.ToString() && X != PlaceServices.ManHairDressingChair.ToString()).ToList(),
                 ListMasters = Masters.Where(m => m.Speciality == CategoryMaster.Hairdresser.ToString() && m.Speciality == CategoryMaster.ManMaster.ToString() && m.Speciality == CategoryMaster.Stylist.ToString()).ToList(),
                 Price = Convert.ToDecimal(rnd.Next(5000, 25000)),//individ
                 TimeRunning = rnd.Next(60, 180),//individ
@@ -89,7 +89,7 @@ namespace ImitModelBl.Model
             {
                 ServiceId = 5,
                 Name = AllServices.уход_за_волосами.ToString(),
-                PlaceServiceType = Enum.GetNames(typeof(PlaceServices)).Where(X => X != PlaceServices.HairStylingChair.ToString() && X != PlaceServices.СhairForSpaTreatments.ToString() && X != PlaceServices.ManHairDressingChair.ToString()).ToList(),
+                ChairsService = Enum.GetNames(typeof(PlaceServices)).Where(X => X != PlaceServices.HairStylingChair.ToString() && X != PlaceServices.СhairForSpaTreatments.ToString() && X != PlaceServices.ManHairDressingChair.ToString()).ToList(),
                 ListMasters = Masters.Where(m => m.Speciality == CategoryMaster.SpaMaster.ToString()).ToList(),
                 Price = Convert.ToDecimal(rnd.Next(3000, 15000)),//individ
                 TimeRunning = rnd.Next(60, 120),//individ
