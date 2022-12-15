@@ -1,87 +1,57 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Codespaces
-Marketplace
-Explore
- 
-@irinaamsn 
-irinaamsn
-/
-ModelService
-Private
-Code
-Issues
-Pull requests
-Actions
-Projects
-Security
-Insights
-Settings
-ModelService/Crmmмодель/Модель/ComputerModel.cs /
-@irinaamsn
-irinaamsn Update and rename CRMModel/Model/ComputerModel.cs to Crmmмодель/Модел…
-…
-Latest commit 15bb3a5 2 часа назад
- History
- 1 contributor
-256 lines (220 sloc)  11.6 KB
-
 using ImitModelBl.Model;
 using System;
-using .Collections.Generic;
-using .Diagnostics.Metrics;
-using .Linq;
-using .Runtime.ConstrainedExecution;
-using .Text;
-using .Threading;
-using .Threading.Tasks;
+using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using static ImitModelBl.Model.Category;
 using static ImitModelBl.Model.EnumPlaceSevices;
-using .Timers;
-using = = .Threading.Timer;
-using .Collections;
+using System.Timers;
+using Timer = System.Threading.Timer;
+using System.Collections;
 
 namespace ImitModelBl.Model
 {
     public class ComputerModel
     {
-        Random = = new();
-        Generator = = new();
-        bool = = ;
+        Random rnd = new();
+        Generator generator = new();
+        bool isRunning = false;
         //public List<Service> Services { get; set; } = new List<Service>();
         // List<Check> Checks { get; set; } = new List<Check>();
         //public List<Sell> Sell { get; set; } = new List<Sell>();
-        public <Master> BelowMasters { get; set; } = new Queue<Master>();
-        public <Master> HairMasters { get; set; } = new Queue<Master>();
-        public <Master> ManMasters { get; set; } = new Queue<Master>();
-        public <Master> SpaMasters { get; set; } = new Queue<Master>();
-        public <Master> StyleMasters { get; set; } = new Queue<Master>();
+        public Queue<Master> BelowMasters { get; set; } = new Queue<Master>();
+        public Queue<Master> HairMasters { get; set; } = new Queue<Master>();
+        public Queue<Master> ManMasters { get; set; } = new Queue<Master>();
+        public Queue<Master> SpaMasters { get; set; } = new Queue<Master>();
+        public Queue<Master> StyleMasters { get; set; } = new Queue<Master>();
        // public List<ListServices> ListServices { get; set; } = new List<ListServices>();//1 cust(all list of services) = 1 master
-        public List<> ClientServices { get; set; } = new List<>();
+        public List<ClientService> ClientServices { get; set; } = new List<ClientService>();
         public int CountWashingHair { get; set; } = 2;
         public int CountHairDrying { get; set; } = 1;
         public int CountHairChair { get; set; } = 3;
         public int CountStylingChair { get; set; } = 3;
         public int CountСhairSpa { get; set; } = 2;
         public int CountManHairChair { get; set; } = 2;
-        public int  ;
+        public int CountPlaces ;
 
 
-        AutoResetEvent autoEvent = new AutoResetEvent (false);
+        AutoResetEvent autoEvent = new AutoResetEvent(false);
         
         public ComputerModel()
         {
-            var =  =generator.GeneratorMasters(3,2,2,3,3);//TODO//WinForm
+            var freeMasters = generator.GeneratorMasters(3,2,2,3,3);//TODO//WinForm
              generator.GeneratorServices();//TODO
                                            //var customers = generator.GeneratorNewCustomers(13);//TODO???????
-            CountPlaces  + CountWashingHair + CountHairDrying + CountHairChair  = CountСhairSpa + CountManHairChair;
+            CountPlaces = CountWashingHair + CountHairDrying + CountHairChair + CountСhairSpa + CountManHairChair;
 
-            foreach (var master in freeMasters.Where(m => m.Speciality == CategoryMaster.Hairdresser.ToString()))
+            foreach (var master in freeMasters.Where(m=> m.Speciality== CategoryMaster.Hairdresser.ToString()))
             {
-                HairMasters.Enqueue (master);
+                HairMasters.Enqueue(master);
             }
 
             foreach (var master in freeMasters.Where(m => m.Speciality == CategoryMaster.ManMaster.ToString()))
@@ -284,17 +254,3 @@ namespace ImitModelBl.Model
         }
     }
 }
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
