@@ -29,7 +29,7 @@ namespace ImitModelBl.Model
         public Queue<Master> SpaMasters { get; set; } = new Queue<Master>();
         public Queue<Master> StyleMasters { get; set; } = new Queue<Master>();
         public List<ClientService> ClientServices { get; set; } = new List<ClientService>();
-        public Reseption Reseption { get; set; }
+        public Reseption Reseption { get; set; } = new Reseption();
         public int CountWashingHair { get; set; } = 2;//
         public int CountHairDrying { get; set; } = 1;//
         public int CountHairChair { get; set; } = 3;//
