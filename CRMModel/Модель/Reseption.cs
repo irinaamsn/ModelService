@@ -8,7 +8,7 @@ namespace ImitModelBl.Model
 {
     public class Reseption
     {
-        public Queue<ListServices> Queue { get; set; } = new Queue<ListServices>();// (очередь клиентов)
+        public Queue<ListServices> Queue { get; set; }// (очередь клиентов)
         public int ExitCustomer { get; set; }//не дождались в очереди//static
         public int CustomerReadyCount { get; set; }//кол-во готовых клиентов, чек закрыт?//
         public int Count => Queue.Count;//кол-во
@@ -17,12 +17,10 @@ namespace ImitModelBl.Model
         public List<Customer> ListCustomerReady { get; set; } = new List<Customer>();//
 
         public event EventHandler<Check> CheckClosed;//событие того что клиент обслужился
-        //public Reseption(Customer customer, int timeWait)
-        //{
-        //    Customer = customer;
-        //    TimeWait=timeWait;
-        //    Queue=new Queue<ListServices>();
-        //}
+        public Reseption()
+        {
+            Queue = new Queue<ListServices>();
+        }
         public void Enqueue(ListServices listServices)
         {
             Queue.Enqueue(listServices); //ставим в очередь клиента
