@@ -1,4 +1,4 @@
-﻿using ImitModelBl.Model;
+using ImitModelBl.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
@@ -37,19 +37,23 @@ namespace ImitModelBl.Model
         public int CountStylingChair { get; set; } = 3;
         public int CountСhairSpa { get; set; } = 2;
         public int CountManHairChair { get; set; } = 2;
-        
+        public int CountPlaces ;
+
+
         AutoResetEvent autoEvent = new AutoResetEvent(false);
         
         public ComputerModel()
         {
             var freeMasters = generator.GeneratorMasters(3,2,2,3,3);//TODO//WinForm
              generator.GeneratorServices();//TODO
-            //var customers = generator.GeneratorNewCustomers(13);//TODO???????
-           
+                                           //var customers = generator.GeneratorNewCustomers(13);//TODO???????
+            CountPlaces = CountWashingHair + CountHairDrying + CountHairChair + CountСhairSpa + CountManHairChair;
+
             foreach (var master in freeMasters.Where(m=> m.Speciality== CategoryMaster.Hairdresser.ToString()))
             {
                 HairMasters.Enqueue(master);
             }
+
             foreach (var master in freeMasters.Where(m => m.Speciality == CategoryMaster.ManMaster.ToString()))
             {
                 ManMasters.Enqueue(master);
@@ -74,38 +78,40 @@ namespace ImitModelBl.Model
             //{
             //    Masters.Enqueue(master);
             //}
-
-            for (int i = 0; i < CountHairChair; i++)////кол-во мест обслуживания TODO//WinForm
+            int Id = 1;
+            while(CountPlaces>0)
             {
-                ClientServices.Add(new ClientService((int)PlaceServices.HairDressingChair, HairMasters.Dequeue()));
-                
-                // ClientServices.Add(new ClientService((int)PlaceServices.HairDressingChair, ManMasters.Dequeue()));
+                for (int i = 0; i < CountHairChair; i++)////кол-во мест обслуживания TODO//WinForm
+                {
+                    ClientServices.Add(new ClientService(Id, HairMasters.Dequeue()));
+                    CountPlaces--;Id++;
+                    // ClientServices.Add(new ClientService((int)PlaceServices.HairDressingChair, ManMasters.Dequeue()));
+                }
+                for (int i = 0; i < CountHairDrying; i++)////кол-во мест обслуживания//TODO//WinForm
+                {
+                    ClientServices.Add(new ClientService(Id, BelowMasters.Dequeue())); CountPlaces--;Id++;
+                }
+                for (int i = 0; i < CountWashingHair; i++)////кол-во мест обслуживания
+                {
+                    ClientServices.Add(new ClientService(Id, BelowMasters.Dequeue())); CountPlaces--;Id++;
+                }
+                for (int i = 0; i < CountСhairSpa; i++)
+                {
+                    ClientServices.Add(new ClientService(Id, SpaMasters.Dequeue())); CountPlaces--; Id++;
+                }
+                for (int i = 0; i < CountStylingChair; i++)
+                {
+                    ClientServices.Add(new ClientService(Id, StyleMasters.Dequeue())); CountPlaces--; Id++;
+                }
+                for (int i = 0; i < CountManHairChair; i++)
+                {
+                    ClientServices.Add(new ClientService(Id, ManMasters.Dequeue())); CountPlaces--; Id++;
+                }
+                //for (int i= 0; i < 5; i++)////кол-во мест обслуживания= 5 услуг - TODO//WinForm
+                //{
+                //    ClientServices.Add(new ClientService(ClientServices.Count,Masters.Dequeue()));
+                //}
             }
-            for (int i = 0; i < CountHairDrying; i++)////кол-во мест обслуживания//TODO//WinForm
-            {
-                ClientServices.Add(new ClientService((int)PlaceServices.HairDrying, BelowMasters.Dequeue() ));
-            }
-            for (int i = 0; i < CountWashingHair; i++)////кол-во мест обслуживания
-            {
-                ClientServices.Add(new ClientService((int)PlaceServices.WashingHair, BelowMasters.Dequeue()));
-            }
-            for (int i = 0; i < CountСhairSpa; i++)
-            {
-                ClientServices.Add(new ClientService((int)PlaceServices.СhairForSpaTreatments, SpaMasters.Dequeue()));
-            }
-            for (int i = 0; i < CountStylingChair; i++)
-            {
-                ClientServices.Add(new ClientService((int)PlaceServices.HairStylingChair, StyleMasters.Dequeue()));
-            }
-            for (int i = 0; i < CountManHairChair; i++)
-            {
-                ClientServices.Add(new ClientService((int)PlaceServices.ManHairDressingChair, ManMasters.Dequeue()));
-            }
-            //for (int i= 0; i < 5; i++)////кол-во мест обслуживания= 5 услуг - TODO//WinForm
-            //{
-            //    ClientServices.Add(new ClientService(ClientServices.Count,Masters.Dequeue()));
-            //}
-            
 
         }
 
@@ -119,7 +125,7 @@ namespace ImitModelBl.Model
             autoEvent.WaitOne();
            var clientServiceTask = ClientServices.Select(c => new Task(() =>  CashClientService(c)));
 
-            foreach(var task in clientServiceTask)
+            foreach(var task  in clientServiceTask)
             {
                 task.Start();
             }
@@ -208,14 +214,14 @@ namespace ImitModelBl.Model
                         foreach (var pl in service.PlaceServiceType)
                         {
                             //поиск кресла номер которого равен номеру места услуги которая выполняется 
-                            var  clArr = ClientServices.FindAll(c => c.NumberPlaceOfService == (int)Enum.Parse(typeof(PlaceServices), pl)).ToArray();
+                            var clArr = ClientServices.FindAll(c => c.NumberPlaceOfService == (int)Enum.Parse(typeof(PlaceServices), pl)).ToArray();//TODO
                             var minCount = clArr.Min(x=>x.Count);
                             cl = clArr.FirstOrDefault(x => x.Count == minCount);
-                            cl.EnqueueService(listService,service);
+                            cl.EnqueueService(service);
                             //Task.Run(() => CashClientService(c)
-                            listPlaces.Add(cl.NumberPlaceOfService);
+                            listPlaces.Add(cl.NumberPlaceOfService);//id//TODO
                            
-                           // cl.WaitingCustomer(customer);//ставим услугу в ожидание
+                            // cl.WaitingCustomer(customer);//ставим услугу в ожидание
                             //cash = ClientServices.
                         }
 
@@ -226,8 +232,9 @@ namespace ImitModelBl.Model
                     foreach (var pl in listPlaces)
                     {
                         //поиск кресла номер которого равен номеру места услуги которая выполняется 
+                        
                         // cl = ClientServices.Find(c => c.NumberPlaceOfService == (int)Enum.Parse(typeof(PlaceServices), pl));
-                        cl = ClientServices.Find(x => x.NumberPlaceOfService == pl);
+                        cl = ClientServices.SingleOrDefault(x => x.NumberPlaceOfService == pl);//enum//TODO
                         cl.Enqueue(listService);
 
                        // cl.WaitingCustomer(customer);//ставим услугу в ожидание
@@ -241,6 +248,7 @@ namespace ImitModelBl.Model
                autoEvent.Set();
                Thread.Sleep(2000);//TODO//time generator new customers
             }
+
           //TODO!!! выполняется обслуживается одно клиетнат(его пакета усулг) async и await параллельно с ругими клиентамит (без async/await) 
            
         }
