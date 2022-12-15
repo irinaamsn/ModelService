@@ -62,7 +62,7 @@ namespace ImitModelBl.Model
                 {
                     var exitCustomer = Queue.Dequeue();//
                     customer.IsCustomerReady = false;
-                    Queue.Dequeue();    
+                       
                     ExitCustomer++;
                     foreach(Service service in exitCustomer)
                     {
