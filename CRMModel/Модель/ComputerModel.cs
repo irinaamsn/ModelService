@@ -22,7 +22,7 @@ namespace ImitModelBl.Model
         Random rnd = new();
         Generator generator = new();
         bool isRunning = false;
-        public List<CycleService> CycleServices { get; set; } = new List<CycleService> ();
+        public List<CycleService> CycleServices { get; set; } = new List<CycleService> ();//в списке найти clientService 
         public Queue<Master> BelowMasters { get; set; } = new Queue<Master>();
         public Queue<Master> HairMasters { get; set; } = new Queue<Master>();
         public Queue<Master> ManMasters { get; set; } = new Queue<Master>();
@@ -40,7 +40,7 @@ namespace ImitModelBl.Model
 
 
         AutoResetEvent autoEvent = new AutoResetEvent(false);
-        
+        CountdownEvent countAutoEvent = new CountdownEvent(1);
         public ComputerModel()
         {
             var freeMasters = generator.GeneratorMasters(3,2,2,3,3);//TODO//WinForm
@@ -118,30 +118,42 @@ namespace ImitModelBl.Model
         {
             isRunning = true;
 
-            var taskCustomers =  Task.Run(() => CreateListServices(15));//генерирую поток новых клиентов
-            
+            var taskCustomers =  Task.Run(() => CreateListServices(5));//генерирую поток новых клиентов
+            var custs = taskCustomers.Status;
            // Thread.Sleep(5000);                                                
            // taskCustomers.Wait();
-           autoEvent.WaitOne();
-           var clientServiceTask = CycleServices.Select(c => new Task(() =>  CashClientService(c)));
+           autoEvent.WaitOne();//countdownEvent
+           var clientServiceTask = ClientServices.Select(c => new Task(() =>  CashClientService(c)));
            
             foreach(var task  in clientServiceTask)
             {
                 task.Start();//запускаю работу всех мест обслуживания
+               // task.Wait();
             }
         }
         public void Stop()
         {
             isRunning= false;   
         }
-       
+        
         public int Waiting = 0;
-        void CashClientService(CycleService cycleService)//TODO
+        void CashClientService(ClientService clientService)//TODO
         {
             while(isRunning)
             {
-                if (cycleService.CountServices> 0)//TODO//кол-во обслуживающих мест//если очередь не пустaя то вызываем клиента из очереди
+                if (clientService.CountServices> 0)//TODO//если очередь не пустaя то вызываем клиента из очереди
                 {
+                    var newCycles = CycleServices.Where(x => x.ClientServices.Contains(clientService)).ToArray();
+                    foreach(var cycle in newCycles)
+                    {
+                        cycle.Customer.StatusWait = true;//забрали
+                        cycle.ClientServices.ForEach(cl => cl.DequeueService(cycle.Customer));
+                        CycleServices.Remove(cycle);
+                    }
+                    
+                    
+                   // clientService.DequeueService();//
+
                     // int t = clientService.TimeWorkingPlace;//TODO
 
                     // var ts = TimeSpan.FromMilliseconds(t * 10);
@@ -153,16 +165,6 @@ namespace ImitModelBl.Model
                     // await task2;
                     //if (task2.Wait(ts))
                     //{
-
-                    //var service = clientService.QueueServices.Dequeue();
-                    //foreach (var pl in service.PlaceServiceType)
-                    //{
-                    //    //поиск кресла номер которого равен номеру места услуги которая выполняется 
-                    //   var place = ClientServices.Find(c => c.NumberPlaceOfService == (int)Enum.Parse(typeof(PlaceServices), pl));
-                    //    place.WaitingClientService(service, pl);
-                    //    // cl.WaitingClientService(service);//ставим услугу в ожидание
-                    //}
-                    cycleService.DequeueServiceCycle();//
                     //}
                     //var t = list.SumTime;
 
@@ -203,22 +205,30 @@ namespace ImitModelBl.Model
                 var customers = generator.GeneratorNewCustomers(countCustomers);
                 //var newClientServ = new List<ClientService>();
                 
-                
                 foreach (var customer in customers)
                 {   
-                    //var listPlaces = new List<int>();
                     var listService = new ListServices(customer);
                     foreach (var service in generator.GetRandomServices(1, 3))
                     {
-                        var cycleservice = new CycleService(customer, service, ClientServices);
+                        var newCLs = new  List<ClientService>();
+                        foreach(var chair in service.ChairsService)
+                        {
+                            var clArr = ClientServices.FindAll(c => c.NumberPlaceOfService == (int)Enum.Parse(typeof(PlaceServices), chair)).ToArray();
+                            var cl = clArr.FirstOrDefault(x => x.CountServices == clArr.Min(x => x.CountServices));
+                            newCLs.Add(cl);
+                        }
+                        var cycleservice = new CycleService(customer, service, newCLs);
+                        CycleServices.Add(cycleservice);//?
                         cycleservice.EnqueueServiceCycle(); 
                         listService.Add(service);
+                        customer.ListServices.Services.Add(service);
                     }
+                    
                     Reseption.Enqueue(listService);
                 }
 
                autoEvent.Set();
-               Thread.Sleep(2000);//TODO//time generator new customers
+               Thread.Sleep(5000);//TODO//time generator new customers
            }
 
           //TODO!!! выполняется обслуживается одно клиетнат(его пакета усулг) async и await параллельно с ругими клиентамит (без async/await) 
