@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
@@ -12,12 +12,15 @@ namespace ImitModelBl.Model
         public int CustomerId { get; set; }
         public string CustomerName { get; set; }
         public int TimeWait { get; set; }
-        public bool IsCustomerReady { get; set; }
+        public bool IsCustomerReady { get; set; } = false;
+        public ListServices ListServices { get; set; } = new ListServices();
+        public bool StatusWait { get; set; } = false;
         // public virtual ICollection<Check> Checks { get; set; }
-        public List<Service> ListServices { get; set; } = new List<Service>();
+        // public ListServices ListServices { get; set; }
         public override string ToString()
         {
             return $"{CustomerName} can wait {TimeWait}";
         }
     }
 }
+
