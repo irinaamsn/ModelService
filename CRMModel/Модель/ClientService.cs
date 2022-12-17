@@ -14,17 +14,18 @@ namespace ImitModelBl.Model
 {
     public class ClientService//обслуживание клиента
     {
+        public Reseption Reseption { get; set; } = new Reseption();
         public int NumberPlaceOfService { get; set; }//number
         public int ClientServiceID { get; set; }
-       // public Reseption Reseption { get; set; }//???
-       // public CycleService CycleService { get; set; }
+       // public List<CycleService> CycleServices { get; set; }
         public Master Master { get; set; }//мастер который обслуживает
         public Queue<Service> QueueServices { get; set; }
         //public int TimeWorkingPlace { get; set; }//??
         public int CountServices => QueueServices.Count;//кол-во
         public int TimeWashingHair { get; set; } = 20;
         public int TimeHairDrying { get; set; } = 15;
-       
+        public List<Customer> Customers { get; set; }
+        
 
         //public event EventHandler<Check> CheckClosed;//событие того что клиент обслужился
         //AutoResetEvent e v = new AutoResetEvent(false);
@@ -34,44 +35,38 @@ namespace ImitModelBl.Model
             NumberPlaceOfService = number;
             Master = master;
             ClientServiceID= id;    
-            QueueServices = new Queue<Service>();//СПИСОК услуг на очередь//////TODO
-            
+            QueueServices = new Queue<Service>();//СПИСОК услуг на очередь////// 
+            Customers= new List<Customer>();
         }
-        //public async void WaitingCustomer(Customer customer)//метод ожидания клиента своей услуги
-        //{
-        //    var ts = TimeSpan.FromMilliseconds(customer.TimeWait * 10);
-            
-        //    await Task.Delay(ts);
-        //    //if (t.Wait(ts))
-        //    {
-        //        if (!customer.IsCustomerReady)
-        //        {
-        //            // foreach(var cust in Queue)
-        //            //if (Queue.Contains(customer.ListServices)
-        //            Queue.Dequeue();
-        //            customer.IsCustomerReady = false;
 
-        //           // Queue.Dequeue();    
-
-        //            ExitCustomer++;
-        //            //foreach(Service service in exitCustomer)
-        //            //{
-        //            //    //var serv = QueueServices.Where(x => x.ServiceId == service.ServiceId);
-        //            //    QueueServices.Dequeue();
-        //            //}
-        //        }
-        //    }
-            
-        //} 
-        //public List<Service>
-        public void EnqueueService(Service service)
+        public void EnqueueService(Service service, Customer customer)
         {
             QueueServices.Enqueue(service);//добавляем услугу в очередь к креслу
-           // ListServices.Add(service);
+            if (!Customers.Contains(customer)) Customers.Add(customer);
+           
         }
-        public async void DequeueService(Service service, string namePlace)
+        public void DequeueService(Customer customer)//связать 2 метода
         {
-            if (QueueServices.Count >0)
+            if (customer.StatusWait == false)
+            {
+                for (int i = 0; i < customer.ListServices.GetAll().Count; i++)
+                {
+                    var service = QueueServices.Dequeue();//убираем из очереди услугу  
+                    Customers.Remove(customer);
+                }
+            }
+            else
+            {
+                var service = QueueServices.Dequeue();//убираем из очереди услугу   
+                var list = Customers.Find(ls => ls == customer).ListServices.Services;
+
+                WaitingService(customer, list, service, Enum.ToObject(typeof(PlaceServices), NumberPlaceOfService).ToString());
+
+            }
+        }
+        public void WaitingService(Customer customer,List<Service> list,Service service, string namePlace)
+        {
+            if (QueueServices.Count > 0)
             {
                 int timeService = service.TimeRunning;//TODO
                 
@@ -79,8 +74,15 @@ namespace ImitModelBl.Model
                 if ((int)Enum.Parse(typeof(PlaceServices), namePlace) == 2) timeService = TimeWashingHair;
                 var ts = TimeSpan.FromMilliseconds(timeService * 10);
                 
-                await Task.Delay(ts);//ждем когда на этом кресле закончится выполнятся предуслуга (одна из циклов услуги)
-                QueueServices.Dequeue();//убираем из очереди услугу
+                 Task.Delay(ts).Wait();//ждем когда на этом кресле закончится выполнятся предуслуга (одна из циклов услуги)
+                //QueueServices.Dequeue();
+                list.Remove(service);
+            }
+            if (list.Count == 0)
+            {
+                customer.IsCustomerReady = true;
+                Customers.Remove(customer);
+                Reseption.Dequeue(customer);
             }
             
         }
