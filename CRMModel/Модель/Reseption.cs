@@ -2,57 +2,64 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ImitModelBl.Model
 {
     public class Reseption
     {
-        public Queue<ListServices> Queue { get; set; }// (очередь клиентов)
+       // public Queue<ListServices> Queue { get; set; }// = new Queue<ListServices>();// (очередь клиентов)
         public int ExitCustomer { get; set; }//не дождались в очереди//static
         public int CustomerReadyCount { get; set; }//кол-во готовых клиентов, чек закрыт?//
-        public int Count => Queue.Count;//кол-во
+        //public int Count => Queue.Count;//кол-во
         public int TimeWait { get; set; }
-        public Customer Customer { get; set; }
+       // public Customer Customer { get; set; }
         public List<Customer> ListCustomerReady { get; set; } = new List<Customer>();//
+
+        CancellationTokenSource cancelTokenSource;
+        CancellationToken token;
 
         public event EventHandler<Check> CheckClosed;//событие того что клиент обслужился
         public Reseption()
         {
-            Queue = new Queue<ListServices>();
+            cancelTokenSource = new CancellationTokenSource();
+            token = cancelTokenSource.Token;
+            // Queue = new Queue<ListServices>();
         }
         public void Enqueue(ListServices listServices)
         {
-            Queue.Enqueue(listServices); //ставим в очередь клиента
-            WaitingCustomer(listServices);
+           // lock(Queue)
+           // Queue.Enqueue(listServices); //ставим в очередь клиента
+            WaitingCustomer(listServices, token);
         }
 
-        public decimal Dequeue()
+        public decimal Dequeue(Customer customer)
         {
             decimal sum = 0;
-            if (Queue.Count == 0)
-            {
-                return 0;
-            }
+            //if (Queue.Count == 0)
+            //{
+            //    return 0;
+            //}
 
             //var listMasters = new List<Master>();
             //listMasters.Add(Master);
 
             // ListServices list = null;
             //delete from queue customer
-            var list = Queue.Dequeue();
-
+            //var list = Queue.Dequeue();
+            var list = customer.ListServices;
             if (list != null)
             {
-                Customer.IsCustomerReady = true;
-                ListCustomerReady.Add(Customer);
+                //Customer.IsCustomerReady = true;
+                ListCustomerReady.Add(customer);
                 CustomerReadyCount++;
                 var check = new Check()
                 {   //Master = Master,
-                    CheckId = Customer.CustomerId,
+                    CheckId = customer.CustomerId,
                    // Masters = listMasters,//???????/
-                    CustomerId = Customer.CustomerId,
-                    Customer = Customer
+                    CustomerId = customer.CustomerId,
+                    Customer = customer
                 };
 
                 var sells = new List<Sell>();//список услуг клиента
@@ -82,21 +89,21 @@ namespace ImitModelBl.Model
             }
             return sum;
         }
-        public async void WaitingCustomer(ListServices listServices)//метод ожидания клиента своей услуги
+        public void WaitingCustomer(ListServices listServices, CancellationToken token)//метод ожидания клиента своей услуги
         {
             var ts = TimeSpan.FromMilliseconds(listServices.Customer.TimeWait * 10);
 
-            await Task.Delay(ts);
-            //if (t.Wait(ts))
+            var t =Task.Delay(ts,token);
+            if (t.Wait(ts))
            // {
-                if (!listServices.Customer.IsCustomerReady)
+                if (!listServices.Customer.IsCustomerReady && !listServices.Customer.StatusWait)
                 {
                     // foreach(var cust in Queue)
                     //if (Queue.Contains(customer.ListServices)
-                    Queue.Dequeue();
+                    //Queue.Dequeue();
                     listServices.Customer.IsCustomerReady = false;
                     ExitCustomer++;
-              
+                    
                 }
            // }
 
